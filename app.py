@@ -1,4 +1,4 @@
-from flask import Flask,jsonify
+from flask import Flask,jsonify,request
 
 app = Flask(__name__)
 
@@ -24,6 +24,22 @@ def getproductbyid(productid):
         return jsonify({"products":product})
     else:
         return jsonify({"message":"product not found"}),404
+    
+@app.route('/api/products',methods=['POST'])
+def add_product():
+    data=request.get_json()
+    
+    if not data or not all(k in data for k in ("name","price")):
+        return jsonify({"error":"Invalid response"})
+    
+    new_id=max([p['id'] for p in products])+1
+    new_products={
+        "id":new_id,
+        "name":data["name"],
+        "price":data["price"]
+    }
+    products.append(new_products)
+    return jsonify(new_products),201
 
 if __name__=='__main__':
     app.run(debug=True)
